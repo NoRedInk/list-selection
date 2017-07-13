@@ -2,6 +2,7 @@
 
 Create a list which may have one (but no more than one) item selected.
 You can never select an item that isn't in the list.
+Selections are optional, so this is slightly different than a zipper.
 
 ## Usage
 
