@@ -1,4 +1,4 @@
-# Selection List
+# Selection List [![Build Status](https://travis-ci.org/NoRedInk/list-selection.svg?branch=master)](https://travis-ci.org/NoRedInk/list-selection)
 
 Create a list which may have one (but no more than one) item selected.
 You can never select an item that isn't in the list.
