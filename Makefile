@@ -5,8 +5,11 @@ all: test documentation.json
 clean:
 	rm -rf elm-stuff tests/elm-stuff documentation.json
 
-documentation.json: $(shell find src -name '*.elm' -type f)
-	elm make --warn --yes --docs=$@
+elm-stuff:
+	elm package install --yes
+
+documentation.json: elm-stuff $(shell find src -name '*.elm' -type f)
+	elm make --warn --docs=$@
 
 .PHONY: test
 test: tests/elm-stuff
