@@ -1,1 +1,5 @@
-elm-stuff/
+elm-stuff
+
+# generated files
+repl-temp-*
+tests/Doc

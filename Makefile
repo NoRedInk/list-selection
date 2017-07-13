@@ -7,6 +7,7 @@ clean:
 
 .PHONY: test
 test: tests/elm-stuff
+	elm-verify-examples
 	elm test
 
 tests/elm-stuff: tests/elm-package.json

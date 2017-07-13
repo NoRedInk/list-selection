@@ -34,16 +34,27 @@ fromList items =
     Selection Nothing items
 
 
-{-| Get something you can iterate over in, say, a view function.
+{-| Convert a Selection list back to a regular list. This is useful for creating
+view functions, for example.
 -}
 toList : Selection a -> List a
-toList (Selection selected items) =
+toList (Selection _ items) =
     items
 
 
 {-| Mark an item as selected. This will select at most one item. Any previously
-selected item will be unselected. Attempting to select an item that doesn't
-exist is a no-op.
+selected item will be unselected.
+
+    fromList ["Burrito", "Chicken Wrap", "Taco Salad"]
+        |> select "Burrito"
+        |> selected --> Just "Burrito"
+
+Attempting to select an item that doesn't exist is a no-op.
+
+    fromList ["Burrito", "Chicken Wrap", "Taco Salad"]
+        |> select "Doner Kebab"
+        |> selected --> Nothing
+
 -}
 select : a -> Selection a -> Selection a
 select el (Selection original items) =
@@ -66,6 +77,11 @@ deselect (Selection _ items) =
 
 
 {-| Get the selected item, which might not exist.
+
+    fromList ["Burrito", "Chicken Wrap", "Taco Salad"]
+        |> select "Burrito"
+        |> selected --> Just "Burrito"
+
 -}
 selected : Selection a -> Maybe a
 selected (Selection selected _) =
@@ -73,6 +89,11 @@ selected (Selection selected _) =
 
 
 {-| Apply a function to all the items, including the currently selected item.
+
+    fromList [1, 2, 3]
+        |> map ((*) 2)
+        |> toList --> [2, 4, 6]
+
 -}
 map : (a -> b) -> Selection a -> Selection b
 map fn (Selection selected items) =
