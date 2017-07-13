@@ -1,9 +1,12 @@
 .PHONY: all
-all: test
+all: test documentation.json
 
 .PHONY: clean
 clean:
-	rm -rf elm-stuff tests/elm-stuff
+	rm -rf elm-stuff tests/elm-stuff documentation.json
+
+documentation.json: $(shell find src -name '*.elm' -type f)
+	elm make --warn --yes --docs=$@
 
 .PHONY: test
 test: tests/elm-stuff

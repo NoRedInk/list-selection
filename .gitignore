@@ -1,5 +1,4 @@
 elm-stuff
-
-# generated files
 repl-temp-*
 tests/Doc
+documentation.json
