@@ -42,7 +42,8 @@ toList (Selection selected items) =
 
 
 {-| Mark an item as selected. This will select at most one item. Any previously
-selected item will be unselected.
+selected item will be unselected. Attempting to select an item that doesn't
+exist is a no-op.
 -}
 select : a -> Selection a -> Selection a
 select el (Selection original items) =
