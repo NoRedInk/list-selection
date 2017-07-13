@@ -50,6 +50,10 @@ todaysMenu
     |> List.Selection.selected -- `Nothing`
 ```
 
+## Developing
+
+Install Elm and `elm-test` and `elm-verify-examples` from NPM, then run `make` to run tests and generate documentation.
+
 ## License
 
 Licensed under a BSD 3-Clause license
