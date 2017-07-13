@@ -19,31 +19,34 @@ type Lunch
     | DonerKebab
 
 
-todaysLunch : Selection Lunch
-todaysLunch =
-    List.Selection.fromList [ Burrito, ChickenWrap, TacoSalad ]
+todaysMenu : Selection Lunch
+todaysMenu =
+    [ Burrito, ChickenWrap, TacoSalad ]
+        |> List.Selection.fromList       -- create a new Selection list
+        |> List.Selection.select Burrito -- now let's see, I think I'd like a burrito (yum, monads!)
 ```
 
-Choose what you want, and set it with `List.Selection.select`.
-Then we can check what we chose with `selected`.
-I think I feel like a `Burrito` today (monads, yum!):
+Since I already chose what I want for lunch, I can get it with `selected`:
 
 ```elm
-List.Selection.select Burrito todaysLunch -- try to select `Burrito`...
-    |> List.Selection.selected            -- it worked! We get `Just Burrito`
+List.Selection.selected todaysMenu -- `Just Burrito`
 ```
 
-&hellip; and if we change our minds we can `deselect`:
+But what if you try and select something that doesn't exist in the list?
+The shop was out of doner kebab today, but what if we ask for it?
 
 ```elm
-List.Selection.deselect todaysLunch -- now `selected` will return `Nothing`
+todaysMenu
+    |> List.Selection.select DonerKebab -- this doesn't exist in our menu, so...
+    |> List.Selection.selected          -- `Just Burrito` (selection unchanged)
 ```
 
-Unfortunately, the shop was out of doner kebab today, so you can't select it!
+And if I change my mind, I can remove my choice with `deselect`:
 
 ```elm
-List.Selection.select DonerKebab todaysLunch -- try to select `DonerKebab`...
-    |> List.Selection.selected               -- it didn't work, so we get `Nothing`
+todaysMenu
+    |> List.Selection.deselect -- deselect any current selection
+    |> List.Selection.selected -- `Nothing`
 ```
 
 ## License
