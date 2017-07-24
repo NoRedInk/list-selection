@@ -5,6 +5,7 @@ module List.Selection
         , fromList
         , map
         , select
+        , selectBy
         , selected
         , toList
         )
@@ -16,7 +17,7 @@ The invariants here:
   - You can select _at most_ one item.
   - You can't select an item that isn't part of the list.
 
-@docs Selection, fromList, toList, select, deselect, selected, map
+@docs Selection, fromList, toList, select, selectBy, deselect, selected, map
 
 -}
 
@@ -57,10 +58,24 @@ Attempting to select an item that doesn't exist is a no-op.
 
 -}
 select : a -> Selection a -> Selection a
-select el (Selection original items) =
+select el selection =
+    selectBy ((==) el) selection
+
+
+{-| Mark an item as selected by specifying a function. This will select the
+first item for which the function returns `True`. Any previously selected item
+will be unselected.
+
+    fromList ["Burrito", "Chicken Wrap", "Taco Salad"]
+        |> selectBy (String.startsWith "B")
+        |> selected --> Just "Burrito"
+
+-}
+selectBy : (a -> Bool) -> Selection a -> Selection a
+selectBy query (Selection original items) =
     Selection
         (items
-            |> List.filter ((==) el)
+            |> List.filter query
             |> List.head
             |> Maybe.map Just
             |> Maybe.withDefault original
