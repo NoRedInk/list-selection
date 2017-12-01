@@ -55,9 +55,9 @@ spec =
                                 (List.Extra.find ((==) b) items)
                                 (List.Extra.find ((==) a) items)
                             )
-            , fuzz2 Fuzz.int (Fuzz.list Fuzz.int) "selecting an item and then deselecting it unsets the selection" <|
+            , fuzz2 Fuzz.int (selection Fuzz.int) "selecting an item and then deselecting it unsets the selection" <|
                 \a items ->
-                    Selection.fromList items
+                    items
                         |> Selection.select a
                         |> Selection.deselect
                         |> Selection.selected
