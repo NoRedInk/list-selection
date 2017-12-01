@@ -5,6 +5,7 @@ module List.Selection
         , deselect
         , fromList
         , map
+        , mapSelected
         , select
         , selectBy
         , selected
@@ -34,7 +35,7 @@ But, these only hold if there are no duplicates in your list.
 
 ## Transforming
 
-@docs map
+@docs map, mapSelected
 
 -}
 
@@ -150,6 +151,15 @@ map fn (Selection selected items) =
     Selection
         (Maybe.map fn selected)
         (List.map fn items)
+
+
+{-| Apply a function to only the selected item, if any item is selected.
+-}
+mapSelected : (a -> a) -> Selection a -> Selection a
+mapSelected fn (Selection selected items) =
+    Selection
+        (Maybe.map fn selected)
+        items
 
 
 {-| Decode a selection from JSON. The result won't have any item

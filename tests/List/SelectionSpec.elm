@@ -19,6 +19,21 @@ selection =
         >> Fuzz.map Selection.fromList
 
 
+nonemptySelection : Fuzzer comparable -> Fuzzer ( comparable, Selection comparable )
+nonemptySelection kind =
+    Fuzz.map2
+        (\item items ->
+            ( item
+            , (item :: items)
+                |> Set.fromList
+                |> Set.toList
+                |> Selection.fromList
+            )
+        )
+        kind
+        (Fuzz.list kind)
+
+
 spec : Test
 spec =
     describe "List.Selection"
@@ -44,17 +59,12 @@ spec =
                         |> Expect.atMost 1
             ]
         , describe "selections"
-            [ fuzz3 Fuzz.int Fuzz.int (Fuzz.list Fuzz.int) "when we have a selection, the last selected item that exists will be selected" <|
-                \a b items ->
-                    Selection.fromList items
-                        |> Selection.select a
-                        |> Selection.select b
+            [ fuzz (nonemptySelection Fuzz.int) "selecting an item works" <|
+                \( item, items ) ->
+                    items
+                        |> Selection.select item
                         |> Selection.selected
-                        |> Expect.equal
-                            (Maybe.Extra.or
-                                (List.Extra.find ((==) b) items)
-                                (List.Extra.find ((==) a) items)
-                            )
+                        |> Expect.equal (Just item)
             , fuzz2 Fuzz.int (selection Fuzz.int) "selecting an item and then deselecting it unsets the selection" <|
                 \a items ->
                     items
@@ -78,5 +88,17 @@ spec =
                                 |> Selection.map ((+) 1)
                                 |> Selection.map ((*) 2)
                             )
+            , fuzz (nonemptySelection Fuzz.int) "only maps the selected item" <|
+                \( item, items ) ->
+                    items
+                        |> Selection.select item
+                        |> Selection.mapSelected ((*) 2)
+                        |> Selection.selected
+                        |> Expect.equal (Just (item * 2))
+            , fuzz (selection Fuzz.int) "doesn't map anything else" <|
+                \items ->
+                    items
+                        |> Selection.mapSelected ((*) 2)
+                        |> Expect.equal items
             ]
         ]
