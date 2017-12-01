@@ -65,26 +65,26 @@ spec =
                         |> Selection.select item
                         |> Selection.selected
                         |> Expect.equal (Just item)
-            , fuzz2 Fuzz.int (selection Fuzz.int) "selecting an item and then deselecting it unsets the selection" <|
-                \a items ->
+            , fuzz (nonemptySelection Fuzz.int) "selecting an item and then deselecting it unsets the selection" <|
+                \( item, items ) ->
                     items
-                        |> Selection.select a
+                        |> Selection.select item
                         |> Selection.deselect
                         |> Selection.selected
                         |> Expect.equal Nothing
             ]
         , describe "mapping"
-            [ fuzz (Fuzz.list Fuzz.int) "identity" <|
-                \xs ->
-                    Selection.fromList xs
+            [ fuzz (selection Fuzz.int) "identity" <|
+                \items ->
+                    items
                         |> Selection.map identity
-                        |> Expect.equal (Selection.fromList xs)
-            , fuzz (Fuzz.list Fuzz.int) "composition" <|
-                \xs ->
-                    Selection.fromList xs
+                        |> Expect.equal items
+            , fuzz (selection Fuzz.int) "composition" <|
+                \items ->
+                    items
                         |> Selection.map ((+) 1 >> (*) 2)
                         |> Expect.equal
-                            (Selection.fromList xs
+                            (items
                                 |> Selection.map ((+) 1)
                                 |> Selection.map ((*) 2)
                             )
