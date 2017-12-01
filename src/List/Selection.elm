@@ -9,6 +9,7 @@ module List.Selection
         , selectBy
         , selected
         , toList
+        , toListWithSelected
         )
 
 {-| This module exposes a list that has at most one selected item.
@@ -18,10 +19,12 @@ The invariants here:
   - You can select _at most_ one item.
   - You can't select an item that isn't part of the list.
 
+But, these only hold if there are no duplicates in your list.
+
 
 ## Converting
 
-@docs Selection, fromList, toList, decoder
+@docs Selection, fromList, toList, toListWithSelected, decoder
 
 
 ## Selecting
@@ -57,6 +60,22 @@ view functions, for example.
 toList : Selection a -> List a
 toList (Selection _ items) =
     items
+
+
+{-| Get a list of items, and if they're selected. Also useful in views.
+-}
+toListWithSelected : Selection a -> List ( a, Bool )
+toListWithSelected (Selection selected items) =
+    case selected of
+        Nothing ->
+            List.map
+                (flip (,) False)
+                items
+
+        Just selection ->
+            List.map
+                (\item -> ( item, selection == item ))
+                items
 
 
 {-| Mark an item as selected. This will select at most one item. Any previously

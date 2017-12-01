@@ -1,17 +1,28 @@
 module List.SelectionSpec exposing (..)
 
 import Expect
-import Fuzz
+import Fuzz exposing (Fuzzer)
 import List.Extra
 import List.Selection as Selection exposing (Selection)
 import Maybe.Extra
+import Set
 import Test exposing (..)
+
+
+selection : Fuzzer comparable -> Fuzzer (Selection comparable)
+selection =
+    Fuzz.list
+        -- our invariants only hold for lists with unique items, so remove those.
+        >> Fuzz.map Set.fromList
+        >> Fuzz.map Set.toList
+        -- construct our Selection!
+        >> Fuzz.map Selection.fromList
 
 
 spec : Test
 spec =
     describe "List.Selection"
-        [ describe "fromList, toList"
+        [ describe "conversions"
             [ fuzz (Fuzz.list Fuzz.int) "every list should be constructable" <|
                 \xs ->
                     Selection.fromList xs
@@ -23,6 +34,14 @@ spec =
                         |> Selection.select a
                         |> Selection.toList
                         |> Expect.equal items
+            , fuzz2 Fuzz.int (selection Fuzz.int) "toListWithSelected has at most one selected item" <|
+                \a items ->
+                    items
+                        |> Selection.select a
+                        |> Selection.toListWithSelected
+                        |> List.filter (Tuple.second >> (==) True)
+                        |> List.length
+                        |> Expect.atMost 1
             ]
         , describe "selections"
             [ fuzz3 Fuzz.int Fuzz.int (Fuzz.list Fuzz.int) "when we have a selection, the last selected item that exists will be selected" <|
