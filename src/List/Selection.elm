@@ -18,7 +18,20 @@ The invariants here:
   - You can select _at most_ one item.
   - You can't select an item that isn't part of the list.
 
-@docs Selection, fromList, toList, select, selectBy, deselect, selected, map, decoder
+
+## Converting
+
+@docs Selection, fromList, toList, decoder
+
+
+## Selecting
+
+@docs select, selectBy, deselect, selected
+
+
+## Transforming
+
+@docs map
 
 -}
 
