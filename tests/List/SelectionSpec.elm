@@ -88,25 +88,30 @@ spec =
                                 |> Selection.map ((+) 1)
                                 |> Selection.map ((*) 2)
                             )
+            , fuzz (selection Fuzz.int) "map and mapSelected are identical with identical functions" <|
+                \items ->
+                    Expect.equal
+                        (Selection.map ((*) 2) items)
+                        (Selection.mapSelected { selected = (*) 2, rest = (*) 2 } items)
             , fuzz (nonemptySelection Fuzz.int) "only maps the selected item" <|
                 \( item, items ) ->
                     items
                         |> Selection.select item
-                        |> Selection.mapSelected ((*) 2)
+                        |> Selection.mapSelected { selected = (*) 2, rest = identity }
                         |> Selection.selected
                         |> Expect.equal (Just (item * 2))
             , fuzz (nonemptySelection Fuzz.int) "maps the original value of the selected item" <|
                 \( item, items ) ->
                     items
                         |> Selection.select item
-                        |> Selection.mapSelected ((*) 2)
+                        |> Selection.mapSelected { selected = (*) 2, rest = identity }
                         |> Selection.toList
                         |> List.member (item * 2)
-                        |> Expect.true "list should contain mapped original item"
+                        |> Expect.true "list should contain mapped original item (and it didn't)"
             , fuzz (selection Fuzz.int) "doesn't map anything else" <|
                 \items ->
                     items
-                        |> Selection.mapSelected ((*) 2)
+                        |> Selection.mapSelected { selected = (*) 2, rest = identity }
                         |> Expect.equal items
             ]
         ]

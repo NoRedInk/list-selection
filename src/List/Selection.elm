@@ -136,7 +136,7 @@ selected (Selection selected _) =
     selected
 
 
-{-| Apply a function to all the items, including the currently selected item.
+{-| Apply a function to all the items.
 
     fromList [1, 2, 3]
         |> map ((*) 2)
@@ -150,18 +150,25 @@ map fn (Selection selected items) =
         (List.map fn items)
 
 
-{-| Apply a function to only the selected item, if any item is selected.
+{-| Apply a function to all the items, treating the selected item
+specially.
+
+    fromList [1, 2, 3]
+        |> select 2
+        |> mapSelected { selected = (*) 2, rest = identity }
+        |> toList --> [1, 4, 3]
+
 -}
-mapSelected : (a -> a) -> Selection a -> Selection a
-mapSelected fn (Selection selected items) =
+mapSelected : { selected : a -> b, rest : a -> b } -> Selection a -> Selection b
+mapSelected mappers (Selection selected items) =
     Selection
-        (Maybe.map fn selected)
+        (Maybe.map mappers.selected selected)
         (List.map
             (\item ->
                 if Just item == selected then
-                    fn item
+                    mappers.selected item
                 else
-                    item
+                    mappers.rest item
             )
             items
         )
