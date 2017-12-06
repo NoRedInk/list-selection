@@ -95,6 +95,14 @@ spec =
                         |> Selection.mapSelected ((*) 2)
                         |> Selection.selected
                         |> Expect.equal (Just (item * 2))
+            , fuzz (nonemptySelection Fuzz.int) "maps the original value of the selected item" <|
+                \( item, items ) ->
+                    items
+                        |> Selection.select item
+                        |> Selection.mapSelected ((*) 2)
+                        |> Selection.toList
+                        |> List.member (item * 2)
+                        |> Expect.true "list should contain mapped original item"
             , fuzz (selection Fuzz.int) "doesn't map anything else" <|
                 \items ->
                     items

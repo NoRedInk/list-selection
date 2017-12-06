@@ -159,7 +159,15 @@ mapSelected : (a -> a) -> Selection a -> Selection a
 mapSelected fn (Selection selected items) =
     Selection
         (Maybe.map fn selected)
-        items
+        (List.map
+            (\item ->
+                if Just item == selected then
+                    fn item
+                else
+                    item
+            )
+            items
+        )
 
 
 {-| Decode a selection from JSON. The result won't have any item
