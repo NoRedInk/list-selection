@@ -1,7 +1,6 @@
 module List.Selection
     exposing
         ( Selection
-        , decoder
         , deselect
         , fromList
         , map
@@ -25,7 +24,7 @@ But, these only hold if there are no duplicates in your list.
 
 ## Converting
 
-@docs Selection, fromList, toList, toListWithSelected, decoder
+@docs Selection, fromList, toList, toListWithSelected
 
 
 ## Selecting
@@ -38,8 +37,6 @@ But, these only hold if there are no duplicates in your list.
 @docs map, mapSelected
 
 -}
-
-import Json.Decode as Decode exposing (Decoder)
 
 
 {-| A list of items, one of which _might_ be selected.
@@ -168,34 +165,3 @@ mapSelected fn (Selection selected items) =
             )
             items
         )
-
-
-{-| Decode a selection from JSON. The result won't have any item
-selected.
-
-If you need to decode the selection too, use `map2`. Here's an
-example, assuming that you have "selected" and "items" in your JSON:
-
-    import Json.Decode exposing (Decoder, decodeString, field, int, map2)
-
-
-    yourDecoder : Decoder (Selection Int)
-    yourDecoder =
-        map2 select
-            (field "selected" int)
-            (field "items" (decoder int))
-
-
-    result : Result String (Selection Int)
-    result =
-        decodeString yourDecoder
-            """{"selected": 2, "items": [1, 2, 3]}"""
-
-    Result.map selected result --> Ok (Just 2)
-
-    Result.map toList result --> Ok [1, 2, 3]
-
--}
-decoder : Decoder a -> Decoder (Selection a)
-decoder =
-    Decode.list >> Decode.map fromList
