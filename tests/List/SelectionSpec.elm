@@ -49,14 +49,6 @@ spec =
                         |> Selection.select a
                         |> Selection.toList
                         |> Expect.equal items
-            , fuzz2 Fuzz.int (selection Fuzz.int) "toListWithSelected has at most one selected item" <|
-                \a items ->
-                    items
-                        |> Selection.select a
-                        |> Selection.toListWithSelected
-                        |> List.filter (Tuple.second >> (==) True)
-                        |> List.length
-                        |> Expect.atMost 1
             ]
         , describe "selections"
             [ fuzz (nonemptySelection Fuzz.int) "selecting an item works" <|

@@ -9,7 +9,6 @@ module List.Selection
         , selectBy
         , selected
         , toList
-        , toListWithSelected
         )
 
 {-| This module exposes a list that has at most one selected item.
@@ -24,7 +23,7 @@ But, these only hold if there are no duplicates in your list.
 
 ## Converting
 
-@docs Selection, fromList, toList, toListWithSelected
+@docs Selection, fromList, toList
 
 
 ## Selecting
@@ -52,28 +51,24 @@ fromList items =
     Selection Nothing items
 
 
-{-| Convert a Selection list back to a regular list. This is useful for creating
-view functions, for example.
+{-| Convert a Selection list back to a regular list. This is useful
+for creating view functions, for example. If you want a list that has
+the selected item, use `mapSelected` like this:
+
+    [ 1, 2, 3 ]
+        |> fromList
+        |> select 2
+        |> mapSelected
+            { selected = (,) True
+            , rest = (,) False
+            }
+        |> toList
+        --> [ (False, 1), (True, 2), (False, 3) ]
+
 -}
 toList : Selection a -> List a
 toList (Selection _ items) =
     items
-
-
-{-| Get a list of items, and if they're selected. Also useful in views.
--}
-toListWithSelected : Selection a -> List ( a, Bool )
-toListWithSelected (Selection selected items) =
-    case selected of
-        Nothing ->
-            List.map
-                (flip (,) False)
-                items
-
-        Just selection ->
-            List.map
-                (\item -> ( item, selection == item ))
-                items
 
 
 {-| Mark an item as selected. This will select at most one item. Any previously
