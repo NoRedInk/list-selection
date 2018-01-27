@@ -13,10 +13,12 @@ selection : Fuzzer comparable -> Fuzzer (Selection comparable)
 selection =
     Fuzz.list
         -- our invariants only hold for lists with unique items, so remove those.
-        >> Fuzz.map Set.fromList
+        >>
+            Fuzz.map Set.fromList
         >> Fuzz.map Set.toList
         -- construct our Selection!
-        >> Fuzz.map Selection.fromList
+        >>
+            Fuzz.map Selection.fromList
 
 
 nonemptySelection : Fuzzer comparable -> Fuzzer ( comparable, Selection comparable )
@@ -32,6 +34,11 @@ nonemptySelection kind =
         )
         kind
         (Fuzz.list kind)
+
+
+isEven : Int -> Bool
+isEven x =
+    x % 2 == 0
 
 
 spec : Test
@@ -105,5 +112,27 @@ spec =
                     items
                         |> Selection.mapSelected { selected = (*) 2, rest = identity }
                         |> Expect.equal items
+            ]
+        , describe "filtering"
+            [ fuzz (selection Fuzz.int) "works like regular filter on lists" <|
+                \items ->
+                    items
+                        |> Selection.toList
+                        |> List.filter isEven
+                        |> Expect.equal (Selection.filter isEven items |> Selection.toList)
+            , fuzz (nonemptySelection Fuzz.int) "preserves selected item" <|
+                \( item, items ) ->
+                    if item |> isEven then
+                        items
+                            |> Selection.select item
+                            |> Selection.filter isEven
+                            |> Selection.selected
+                            |> Expect.equal (Just item)
+                    else
+                        items
+                            |> Selection.select item
+                            |> Selection.filter isEven
+                            |> Selection.selected
+                            |> Expect.equal Nothing
             ]
         ]
