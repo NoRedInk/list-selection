@@ -170,28 +170,13 @@ mapSelected mappers (Selection selected items) =
         )
 
 
-{-| Filter all items where predicate evaluates to false, preserving unfiltered
-selected item.
+{-| Filter all items where predicate evaluates to false, preserving selected item
+when unfiltered.
 
     fromList [1, 2, 3]
         |> select 2
         |> filter ((>) 2)
         |> toList --> [1]
-
-    fromList [1, 2, 3]
-        |> select 2
-        |> filter ((>) 2)
-        |> selected --> Nothing
-
-    fromList [1, 2, 3]
-        |> select 2
-        |> filter ((<) 1)
-        |> toList --> [2, 3]
-
-    fromList [1, 2, 3]
-        |> select 2
-        |> filter ((<) 1)
-        |> selected --> Just 2
 
 -}
 filter : (a -> Bool) -> Selection a -> Selection a
@@ -202,10 +187,10 @@ filter predicate (Selection selected items) =
                 |> List.filter predicate
                 |> fromList
     in
-        case selected of
-            Just selection ->
-                filteredSelection
-                    |> select selection
+    case selected of
+        Just selection ->
+            filteredSelection
+                |> select selection
 
-            Nothing ->
-                filteredSelection
+        Nothing ->
+            filteredSelection
