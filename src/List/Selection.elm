@@ -2,6 +2,7 @@ module List.Selection
     exposing
         ( Selection
         , deselect
+        , filter
         , fromList
         , map
         , mapSelected
@@ -33,7 +34,7 @@ But, these only hold if there are no duplicates in your list.
 
 ## Transforming
 
-@docs map, mapSelected
+@docs map, mapSelected, filter
 
 -}
 
@@ -167,3 +168,29 @@ mapSelected mappers (Selection selected items) =
             )
             items
         )
+
+
+{-| Filter all items where predicate evaluates to false, preserving selected item
+when unfiltered.
+
+    fromList [1, 2, 3]
+        |> select 2
+        |> filter ((>) 2)
+        |> toList --> [1]
+
+-}
+filter : (a -> Bool) -> Selection a -> Selection a
+filter predicate (Selection selected items) =
+    let
+        filteredSelection =
+            items
+                |> List.filter predicate
+                |> fromList
+    in
+    case selected of
+        Just selection ->
+            filteredSelection
+                |> select selection
+
+        Nothing ->
+            filteredSelection

@@ -2,9 +2,7 @@ module List.SelectionSpec exposing (..)
 
 import Expect
 import Fuzz exposing (Fuzzer)
-import List.Extra
 import List.Selection as Selection exposing (Selection)
-import Maybe.Extra
 import Set
 import Test exposing (..)
 
@@ -32,6 +30,11 @@ nonemptySelection kind =
         )
         kind
         (Fuzz.list kind)
+
+
+isEven : Int -> Bool
+isEven x =
+    x % 2 == 0
 
 
 spec : Test
@@ -105,5 +108,33 @@ spec =
                     items
                         |> Selection.mapSelected { selected = (*) 2, rest = identity }
                         |> Expect.equal items
+            ]
+        , describe "filtering"
+            [ fuzz (selection Fuzz.int) "works like regular filter on lists" <|
+                \items ->
+                    items
+                        |> Selection.toList
+                        |> List.filter isEven
+                        |> Expect.equal
+                            (items
+                                |> Selection.filter isEven
+                                |> Selection.toList
+                            )
+            , fuzz (nonemptySelection Fuzz.int) "preserves selected item" <|
+                \( item, items ) ->
+                    items
+                        |> Selection.map ((*) 2)
+                        |> Selection.select (item * 2)
+                        |> Selection.filter isEven
+                        |> Selection.selected
+                        |> Expect.equal (Just (item * 2))
+            , fuzz (nonemptySelection Fuzz.int) "removes selected item when filtered by predicate" <|
+                \( item, items ) ->
+                    items
+                        |> Selection.map ((*) 2)
+                        |> Selection.select (item * 2)
+                        |> Selection.filter (\x -> not (isEven x))
+                        |> Selection.selected
+                        |> Expect.equal Nothing
             ]
         ]
