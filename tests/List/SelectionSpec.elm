@@ -34,7 +34,7 @@ nonemptySelection kind =
 
 isEven : Int -> Bool
 isEven x =
-    x % 2 == 0
+    modBy 2 x == 0
 
 
 spec : Test
