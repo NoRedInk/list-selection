@@ -60,8 +60,8 @@ the selected item, use `mapSelected` like this:
         |> fromList
         |> select 2
         |> mapSelected
-            { selected = (,) True
-            , rest = (,) False
+            { selected = \a -> (True, a)
+            , rest = \a -> (False, a)
             }
         |> toList
         --> [ (False, 1), (True, 2), (False, 3) ]
@@ -128,8 +128,8 @@ deselect (Selection _ items) =
 
 -}
 selected : Selection a -> Maybe a
-selected (Selection selected _) =
-    selected
+selected (Selection selectedItem _) =
+    selectedItem
 
 
 {-| Apply a function to all the items.
@@ -140,9 +140,9 @@ selected (Selection selected _) =
 
 -}
 map : (a -> b) -> Selection a -> Selection b
-map fn (Selection selected items) =
+map fn (Selection selectedItem items) =
     Selection
-        (Maybe.map fn selected)
+        (Maybe.map fn selectedItem)
         (List.map fn items)
 
 
@@ -156,12 +156,12 @@ specially.
 
 -}
 mapSelected : { selected : a -> b, rest : a -> b } -> Selection a -> Selection b
-mapSelected mappers (Selection selected items) =
+mapSelected mappers (Selection selectedItem items) =
     Selection
-        (Maybe.map mappers.selected selected)
+        (Maybe.map mappers.selected selectedItem)
         (List.map
             (\item ->
-                if Just item == selected then
+                if Just item == selectedItem then
                     mappers.selected item
                 else
                     mappers.rest item
@@ -180,14 +180,14 @@ when unfiltered.
 
 -}
 filter : (a -> Bool) -> Selection a -> Selection a
-filter predicate (Selection selected items) =
+filter predicate (Selection selectedItem items) =
     let
         filteredSelection =
             items
                 |> List.filter predicate
                 |> fromList
     in
-    case selected of
+    case selectedItem of
         Just selection ->
             filteredSelection
                 |> select selection
